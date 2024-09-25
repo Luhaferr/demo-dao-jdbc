@@ -19,11 +19,14 @@ public interface SellerDao {
     void deleteById(Integer id);
 
     /*
-    método responsável por pegar o id do parâmetro e CONSULTAR no BD um objeto com esse id, se existir retorna
+    método para pegar o id do parâmetro e CONSULTAR no BD um objeto com esse id, se existir retorna
     se não retorna null
      */
     Seller findById(Integer id);
 
     //retorna todos os departamentos em uma lista
     List<Seller> findAll();
+
+    //método para retornar uma lista de sellers sendo buscados por department
+    List<Seller> findByDepartment(Department department);
 }
