@@ -102,6 +102,7 @@ public class SellerDaoJDBC implements SellerDao {
         }
     }
 
+    //método para deletar um Seller por Id
     @Override
     public void deleteById(Integer id) {
         //validação de ID para evitar consultas desnecessárias no BD.
