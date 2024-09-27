@@ -90,6 +90,7 @@ public class SellerDaoJDBC implements SellerDao {
             st.setInt(5, obj.getDepartment().getId());
             st.setInt(6, obj.getId());
 
+            //executando o comando
             st.executeUpdate();
         }
         catch (SQLException e) {
@@ -103,7 +104,25 @@ public class SellerDaoJDBC implements SellerDao {
 
     @Override
     public void deleteById(Integer id) {
-
+        //objeto para executar consultas SQL com parâmetros.
+        PreparedStatement st = null;
+        try {
+            st = conn.prepareStatement("DELETE FROM seller WHERE Id = ?");
+            //substituindo o placeholder
+            st.setInt(1, id);
+            //executando o comando
+            int rows = st.executeUpdate();
+            //verifica se o id não foi encontrado
+            if (rows == 0) {
+                throw new DbException("Error! Id not found");
+            }
+        }
+        catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }
+        finally {
+            DB.closeStatement(st);
+        }
     }
 
     //método para consultar Seller por Id
