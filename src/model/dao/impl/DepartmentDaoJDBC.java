@@ -4,6 +4,7 @@ import db.DB;
 import db.DbException;
 import model.dao.DepartmentDao;
 import model.entities.Department;
+import model.entities.Seller;
 
 import java.sql.*;
 import java.util.List;
@@ -50,6 +51,10 @@ public class DepartmentDaoJDBC implements DepartmentDao {
     @Override
     public void update(Department obj, Integer id) {
         //todo: lógica de verificação em caso de id não existente
+        //validação de ID para evitar consultas desnecessárias no BD.
+        if (id == null || id <=0) {
+            throw new DbException("Invalid Id: " + id);
+        }
         PreparedStatement st = null;
         try {
             st = conn.prepareStatement("UPDATE department SET Name = ? WHERE Id = ?");
@@ -67,12 +72,72 @@ public class DepartmentDaoJDBC implements DepartmentDao {
 
     @Override
     public void deleteById(Integer id) {
-
+        //validação de ID para evitar consultas desnecessárias no BD.
+        if (id == null || id <=0) {
+            throw new DbException("Invalid Id: " + id);
+        }
+        PreparedStatement st = null;
+        try {
+            st = conn.prepareStatement("DELETE FROM department WHERE Id = ?");
+            st.setInt(1, id);
+            int rows = st.executeUpdate();
+            if (rows == 0) {
+                throw new DbException("Error! Id not found");
+            }
+        }
+        catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }
+        finally {
+            DB.closeStatement(st);
+        }
     }
 
     @Override
     public Department findById(Integer id) {
-        return null;
+        //validação de ID para evitar consultas desnecessárias no BD.
+        if (id == null || id <=0) {
+            throw new DbException("Invalid Id: " + id);
+        }
+        //objeto para executar consultas SQL com parâmetros.
+        PreparedStatement st = null;
+        //armazena e manipula os resultados da consulta SQL feitas pelo PreparedStatement
+        ResultSet rs = null;
+        try {
+            st = conn.prepareStatement(
+                    "SELECT * FROM department WHERE Id = ?");
+            //substituindo o placeholder
+            st.setInt(1, id);
+
+            //rs recebe o resultado da execução da consulta
+            rs = st.executeQuery();
+
+            /*
+            o resultset traz resultados em forma de tabela, como usamos POO,
+            a lógica abaixo cria um objeto do tipo Department
+
+
+            o if é pra existe algum resultado, ou seja, se existe algum department com esses parâmetros,
+            se não houver ele retorna null/não existe department com esse Id.
+            o next é para continuar navegando pelos dados da tabela para instanciar o objeto
+             */
+            if (rs.next()) {
+                //instanciando departamento
+                Department obj = new Department();
+                obj.setId(rs.getInt("Id"));
+                obj.setName(rs.getString("Name"));
+                return obj;
+            }
+            return null;
+        }
+        catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }
+        //fechamento dos recursos
+        finally {
+            DB.closeStatement(st);
+            DB.closeResultSet(rs);
+        }
     }
 
     @Override

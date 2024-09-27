@@ -18,5 +18,11 @@ public class Program2 {
 
         System.out.println("\n=== Test 2: Department update ===");
         departmentDao.update(new Department(null,"Library"), 15);
+
+        System.out.println("\n=== Test 3: Department findById ===");
+        Department department2 = departmentDao.findById(3);
+        System.out.println(department2);
+
+
     }
 }

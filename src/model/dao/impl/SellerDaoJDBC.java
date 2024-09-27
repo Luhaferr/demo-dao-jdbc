@@ -104,6 +104,10 @@ public class SellerDaoJDBC implements SellerDao {
 
     @Override
     public void deleteById(Integer id) {
+        //validação de ID para evitar consultas desnecessárias no BD.
+        if (id == null || id <=0) {
+            throw new DbException("Invalid Id: " + id);
+        }
         //objeto para executar consultas SQL com parâmetros.
         PreparedStatement st = null;
         try {
