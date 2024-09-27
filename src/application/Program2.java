@@ -17,6 +17,6 @@ public class Program2 {
         System.out.println("Inserted! New id = " + department.getId());
 
         System.out.println("\n=== Test 2: Department update ===");
-        departmentDao.insert(department);
+        departmentDao.update(new Department(null,"Library"), 15);
     }
 }

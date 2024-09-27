@@ -128,6 +128,10 @@ public class SellerDaoJDBC implements SellerDao {
     //método para consultar Seller por Id
     @Override
     public Seller findById(Integer id) {
+        //validação de ID para evitar consultas desnecessárias no BD.
+        if (id == null || id <=0) {
+            throw new DbException("Invalid Id: " + id);
+        }
         //objeto para executar consultas SQL com parâmetros.
         PreparedStatement st = null;
         //armazena e manipula os resultados da consulta SQL feitas pelo PreparedStatement
