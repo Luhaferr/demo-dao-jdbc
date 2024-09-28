@@ -78,6 +78,8 @@ public class SellerDaoJDBC implements SellerDao {
             }
             //confirmação explicita para que as operações sejam executadas
             conn.commit();
+            //retorno de sucesso na operação
+            System.out.println("Seller inserted successfully! New Id = " + obj.getId());
         }
         catch (SQLException e) {
             try {
@@ -100,6 +102,21 @@ public class SellerDaoJDBC implements SellerDao {
         //objeto para executar consultas SQL com parâmetros.
         PreparedStatement st = null;
         try {
+            //validação dos dados de entrada de Seller
+            if (obj.getName() == null || obj.getName().trim().isEmpty()) {
+                throw new IllegalArgumentException("Seller name cannot be null or empty.");
+            }
+            if (obj.getEmail() == null || obj.getEmail().trim().isEmpty()) {
+                throw new IllegalArgumentException("Seller email cannot be null or empty.");
+            }
+            if (obj.getDepartment() == null) {
+                throw new IllegalArgumentException("Department cannot be null.");
+            }
+            if (obj.getBaseSalary() <= 0) {
+                throw new IllegalArgumentException("Base salary must be greater than zero.");
+            }
+
+            conn.setAutoCommit(false);
             st = conn.prepareStatement(
                     "UPDATE seller "
                         + "SET Name = ?, Email = ?, BirthDate = ?, BaseSalary = ?, DepartmentId = ? "
@@ -113,13 +130,27 @@ public class SellerDaoJDBC implements SellerDao {
             st.setInt(5, obj.getDepartment().getId());
             st.setInt(6, obj.getId());
 
-            //executando o comando
-            st.executeUpdate();
+            //Executando o comando SQL
+            int rowsAffected = st.executeUpdate();
+
+            //Confirma a transação se houver linhas afetadas
+            if (rowsAffected > 0) {
+                conn.commit(); // Faz o commit explícito da transação
+                System.out.println("Update successful for Seller ID: " + obj.getId());
+            } else {
+                throw new DbException("No rows affected. Seller ID may not exist: " + obj.getId());
+            }
         }
         catch (SQLException e) {
-            throw new DbException(e.getMessage());
+            try {
+                //o rollback faz com que a transação volte caso tenha parado no meio.
+                conn.rollback();
+                throw new DbException("Transaction rolled back! Caused by: " + e.getMessage());
+            } catch (SQLException ex) {
+                //em caso de erro no rollback
+                throw new DbException("Error trying to rollback! Caused by: " + ex.getMessage());
+            }
         }
-        //fechamento do recurso Statement
         finally {
             DB.closeStatement(st);
         }
@@ -135,6 +166,8 @@ public class SellerDaoJDBC implements SellerDao {
         //objeto para executar consultas SQL com parâmetros.
         PreparedStatement st = null;
         try {
+            // Inicia a transação
+            conn.setAutoCommit(false);
             st = conn.prepareStatement("DELETE FROM seller WHERE Id = ?");
             //substituindo o placeholder
             st.setInt(1, id);
@@ -144,9 +177,19 @@ public class SellerDaoJDBC implements SellerDao {
             if (rows == 0) {
                 throw new DbException("Error! Id not found");
             }
+            //confirmação explicita para que as operações sejam executadas
+            conn.commit();
+            System.out.println("Seller deleted sucessfully! Deleted Seller ID = " + id);
         }
         catch (SQLException e) {
-            throw new DbException(e.getMessage());
+            try {
+                //o rollback faz com que a transação volte caso tenha parado no meio.
+                conn.rollback();
+                throw new DbException("Transaction rolled back! Caused by: " + e.getMessage());
+            } catch (SQLException ex) {
+                //em caso de erro no rollback
+                throw new DbException("Error trying to rollback! Caused by: " + ex.getMessage());
+            }
         }
         finally {
             DB.closeStatement(st);
@@ -278,6 +321,10 @@ public class SellerDaoJDBC implements SellerDao {
     //método para consultar um Seller por departamento ordenados por nome
     @Override
     public List<Seller> findByDepartment(Department department) {
+        //validação de ID para evitar consultas desnecessárias no BD.
+        if (department == null) {
+            throw new IllegalArgumentException("Department cannot be null.");
+        }
         //objeto para executar consultas SQL com parâmetros.
         PreparedStatement st = null;
         //armazena e manipula os resultados da consulta SQL feitas pelo PreparedStatement
@@ -319,6 +366,10 @@ public class SellerDaoJDBC implements SellerDao {
                 //instanciando vendedor
                 Seller obj = instantiateSeller(rs, dep);
                 list.add(obj);
+            }
+            //Verifica se a lista está vazia
+            if (list.isEmpty()) {
+                System.out.println("No sellers found for department ID: " + department.getId());
             }
             return list;
         }

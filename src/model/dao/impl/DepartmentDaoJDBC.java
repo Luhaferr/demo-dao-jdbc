@@ -54,7 +54,7 @@ public class DepartmentDaoJDBC implements DepartmentDao {
             //confirmação explicita para que as operações sejam executadas
             conn.commit();
             //retorno de sucesso na operação
-            System.out.println("Inserted successfully! New Id = " + obj.getId());
+            System.out.println("Department inserted successfully! New Id = " + obj.getId());
         }
         catch (SQLException e) {
             try {
@@ -86,7 +86,7 @@ public class DepartmentDaoJDBC implements DepartmentDao {
             //confirmação explicita para que as operações sejam executadas
             conn.commit();
             //retorno de sucesso na operação
-            System.out.println("Update completed: " + obj);
+            System.out.println("Update successful! " + obj);
         }
         catch (SQLException e) {
             try {
