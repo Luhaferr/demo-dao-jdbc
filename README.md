@@ -1,4 +1,4 @@
-# Seller Management Application - JDBC
+# Projeto JDBC: Sistema de Gerenciamento de Vendedores e Departamentos
 
 Este projeto é uma aplicação Java simples que demonstra como gerenciar vendedores (sellers) e departamentos (departments) utilizando JDBC (Java Database Connectivity). A aplicação interage com um banco de dados MySQL para realizar operações básicas de CRUD (Create, Read, Update, Delete) em vendedores e departamentos.
 
