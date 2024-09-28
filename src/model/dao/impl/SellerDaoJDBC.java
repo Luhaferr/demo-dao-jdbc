@@ -27,6 +27,21 @@ public class SellerDaoJDBC implements SellerDao {
         //objeto para executar consultas SQL com parâmetros.
         PreparedStatement st = null;
         try {
+            //validação dos dados de entrada de Seller
+            if (obj.getName() == null || obj.getName().trim().isEmpty()) {
+                throw new IllegalArgumentException("Seller name cannot be null or empty.");
+            }
+            if (obj.getEmail() == null || obj.getEmail().trim().isEmpty()) {
+                throw new IllegalArgumentException("Seller email cannot be null or empty.");
+            }
+            if (obj.getDepartment() == null) {
+                throw new IllegalArgumentException("Department cannot be null.");
+            }
+            if (obj.getBaseSalary() <= 0) {
+                throw new IllegalArgumentException("Base salary must be greater than zero.");
+            }
+            // Inicia a transação
+            conn.setAutoCommit(false);
             st = conn.prepareStatement("INSERT INTO seller "
                             + "(Name, Email, BirthDate, BaseSalary, DepartmentId) "
                             + "VALUES "
@@ -61,11 +76,19 @@ public class SellerDaoJDBC implements SellerDao {
                 //exceção caso não hajam linhas afetadas
                 throw new DbException("Unexpected error! No rows affected!");
             }
+            //confirmação explicita para que as operações sejam executadas
+            conn.commit();
         }
         catch (SQLException e) {
-            throw new DbException(e.getMessage());
+            try {
+                //o rollback faz com que a transação volte caso tenha parado no meio.
+                conn.rollback();
+                throw new DbException("Transaction rolled back! Caused by: " + e.getMessage());
+            } catch (SQLException ex) {
+                //em caso de erro no rollback
+                throw new DbException("Error trying to rollback! Caused by: " + ex.getMessage());
+            }
         }
-        //fechamento do recurso Statement
         finally {
             DB.closeStatement(st);
         }

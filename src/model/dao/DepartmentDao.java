@@ -9,7 +9,7 @@ public interface DepartmentDao {
     void insert(Department obj);
 
     //atualiza um objeto department
-    void update(Department obj, Integer id);
+    void update(Department obj);
 
     /*
     método responsável por pegar o id do parâmetro e DELETAR no BD um objeto com esse id, se existir retorna
