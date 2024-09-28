@@ -9,15 +9,23 @@ Este projeto é uma aplicação Java simples que demonstra como gerenciar vended
 - Adicionar, atualizar e excluir vendedores e departamentos
 - Gerenciamento de transações com commit e rollback
 - Tratamento de erros com exceções customizadas
+- Validações de entrada de dados
 
 ## Tecnologias Utilizadas
 
 - **Java**
 - **JDBC**
 - **MySQL**
-- **PreparedStatement**
+- **MySQL Connector/J**
 - **Gerenciamento de transações com commit/rollback**
 - **Tratamento de exceções**
+- **Git**
+
+## Requisitos
+
+- Java JDK 8 ou superior.
+- MySQL instalado e configurado.
+- Driver JDBC para o banco de dados (MySQL Connector/J).
 
 ## Configuração do Banco de Dados
 
